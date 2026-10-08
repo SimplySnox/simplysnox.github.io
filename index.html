@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSM Quick Notes</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            background: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1 {
+            font-size: 1.5em;
+            color: #333;
+            margin-top: 0;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        .controls {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button.secondary {
+            background: #6c757d;
+        }
+        button.secondary:hover {
+            background: #5a6268;
+        }
+        .status {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 0;
+                max-width: 100%;
+            }
+            .controls, .status, h1 span {
+                display: none !important;
+            }
+            textarea {
+                border: none;
+                resize: none;
+                height: auto;
+                min-height: 100mm; /* Adjust based on label size */
+                font-size: 12pt;
+                line-height: 1.4;
+                width: 100%;
+            }
+            /* Hide scrollbar during print */
+            ::-webkit-scrollbar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PSM Commercial Notes <span id="timestamp"></span></h1>
+        <textarea id="noteInput" placeholder="Type your note here... e.g., Call John re: PO#12345 – delivery by Friday"></textarea>
+        <div class="controls">
+            <button onclick="printNote()">🖨️ Print Note</button>
+            <button class="secondary" onclick="clearNote()">Clear</button>
+        </div>
+        <div class="status" id="statusMsg"></div>
+    </div>
+
+    <script>
+        // Load saved note on startup
+        window.onload = function() {
+            const savedNote = localStorage.getItem('psm_note');
+            if (savedNote) {
+                document.getElementById('noteInput').value = savedNote;
+            }
+            updateTimestamp();
+        };
+
+        // Auto-save every time user types
+        document.getElementById('noteInput').addEventListener('input', function() {
+            localStorage.setItem('psm_note', this.value);
+            showStatus('Saved locally');
+        });
+
+        function printNote() {
+            window.print();
+        }
+
+        function clearNote() {
+            if(confirm('Clear all notes?')) {
+                document.getElementById('noteInput').value = '';
+                localStorage.removeItem('psm_note');
+                showStatus('Cleared');
+            }
+        }
+
+        function showStatus(msg) {
+            const statusEl = document.getElementById('statusMsg');
+            statusEl.textContent = msg;
+            setTimeout(() => {
+                statusEl.textContent = '';
+            }, 2000);
+        }
+
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('timestamp').textContent = `[${now.toLocaleString()}]`;
+        }
+    </script>
+</body>
+</html>
